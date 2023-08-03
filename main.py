@@ -1,7 +1,7 @@
 def calculator():
     print("Введите математическое выражение, которое хотите вычислить.")
     print("Введите help - для справки, end - для завершения программы.")
-    valid_characters = [chr(37), chr(42), chr(43)] + list(map(chr, range(45, 58)))
+    valid_characters = [chr(37), chr(40), chr(41), chr(42), chr(43), ' '] + list(map(chr, range(45, 58)))
 
     def help_info():
         print(
@@ -26,11 +26,24 @@ def calculator():
 
             last_symbol = symbol
 
+    def transform(exp: str):
+        if exp.count("(") != exp.count(")"):  # проверка на закрытие скобок
+            raise SyntaxError
+
+        if exp.find("(") == -1:
+            return exp
+        else:
+            first_part = exp[0:exp.rfind("(")] + str(eval(exp[exp.rfind("(") + 1: exp.find(")", exp.rfind("("))]))
+            second_part = str(eval(exp[exp.rfind("(") + 1: exp.find(")", exp.rfind("("))]))
+            third_part = exp[exp.find(")", exp.rfind("(")) + 1:]
+            exp = first_part + second_part + third_part
+            return transform(exp)
+
     while True:
         try:
 
             expression = input("> ")
-
+            expression.replace(" ", '')
             if expression.lower() == 'end':
                 print("Завершение программы!")
                 break
@@ -39,6 +52,7 @@ def calculator():
                 continue
 
             checking_correctness(expression)
+            transform(expression)
 
             print(f"Результат: {round(eval(expression), 5)}")
 
